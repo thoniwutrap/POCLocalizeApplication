@@ -1,41 +1,73 @@
 package com.example.poclocalizeactivity
 
-import android.Manifest
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Environment
 import android.util.Log
-import android.widget.Toast
-import com.livinglifetechway.quickpermissions_kotlin.runWithPermissions
 import kotlinx.android.synthetic.main.activity_main.*
-import java.io.File
-import java.io.FileOutputStream
-import javax.xml.xpath.XPathFactory
-import java.nio.file.Files.exists
+import java.util.*
+import android.content.Intent
+import android.view.Menu
+import android.view.MenuItem
+import com.example.poclocalizeactivity.dialog.LocalizeDialog
+import com.ice.restring.Restring
+import org.json.JSONObject
 
 
 
-class MainActivity : AppCompatActivity() {
+
+class MainActivity : BaseActivity(),LocalizeDialog.DialogOnClickListener {
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        methodWithPermissions()
-        btnTest.setOnClickListener {
-            createFolder()
-        }
-
-    }
-
-    fun methodWithPermissions() = runWithPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE) {
-        Log.e("Path", Environment.getExternalStorageState().toString())
-    }
-
-    fun createFolder(){
-        val file = File("src/values", "Records.txt")
-        FileOutputStream(file).use {
-            it.write("fdsf".toByteArray())
+        setSupportActionBar(toolbar)
+        btnPage2.setOnClickListener {
+            Intent(this,Page2Activity::class.java).apply {
+                startActivity(this)
+            }
         }
     }
 
+
+    private fun setLocale(code : String) {
+        val fileName = "lang-$code.json"
+        val jsonAddress = assets.open(fileName).bufferedReader().use {
+            it.readText()
+        }
+        val inputJSON = JSONObject(jsonAddress)
+        val preferencesJSON = inputJSON.getJSONObject(code)
+        val keysIterator = preferencesJSON.keys()
+        while (keysIterator.hasNext()) {
+            val keyStr = keysIterator.next() as String
+            val valueStr = preferencesJSON.getString(keyStr)
+            Restring.setString(code,keyStr,valueStr)
+        }
+        val locale = Locale(code)
+        Locale.setDefault(locale)
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent) // start same activity
+        finish() // destroy older activity
+        overridePendingTransition(0, 0) // this is important for seamless transition
+    }
+
+    override fun onSelectLanguage(code: String) {
+        setLocale(code)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.main_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.getItemId()) {
+            R.id.btnSelectLanguage -> {
+                showLanguageDialog()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
 }

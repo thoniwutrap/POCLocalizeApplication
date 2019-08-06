@@ -5,7 +5,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 
-ext{
+ext {
     quickpermissions = '0.4.0'
 }
 
@@ -27,13 +27,6 @@ android {
         }
     }
 
-    sourceSets {
-        main {
-            resources {
-                srcDir 'sub-module/src/res'
-            }
-        }
-    }
 }
 
 dependencies {
@@ -41,10 +34,12 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'androidx.core:core-ktx:1.0.2'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0-beta01'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
     implementation "com.github.quickpermissions:quickpermissions-kotlin:$quickpermissions"
+    implementation 'com.ice.restring:restring:1.0.0'
 }
