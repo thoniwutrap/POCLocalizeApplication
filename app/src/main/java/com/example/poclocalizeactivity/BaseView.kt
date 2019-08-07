@@ -4,4 +4,5 @@ interface BaseView {
 
     fun showLanguageDialog()
 
+    fun reActivity(cls: Class<MainActivity>)
 }
